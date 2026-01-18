@@ -85,10 +85,10 @@ pipeline {
     }
 
     post {
-        always {
-            archiveArtifacts artifacts: 'coverage.xml', fingerprint: true
-	    archiveArtifacts artifacts: 'jmeter-results.jtl', fingerprint: true, allowEmptyArchive: true
-
-        }
+    always {
+        archiveArtifacts artifacts: 'coverage.xml', fingerprint: true
+        archiveArtifacts artifacts: 'jmeter-results.jtl', fingerprint: true, allowEmptyArchive: true
+	}
     }
+
 }
