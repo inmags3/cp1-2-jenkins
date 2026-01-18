@@ -60,11 +60,35 @@ pipeline {
                 '''
             }
         }
+	stage('Performance (JMeter)') {
+	    steps {
+		sh '''
+
+	            . .venv_ci/bin/activate
+
+            	    # Arrancamos la API en segundo plano
+                    python -m app.api &
+                    API_PID=$!
+
+                    # Esperamos un momento a que levante
+                    sleep 2
+
+                    # Ejecutamos JMeter (no-GUI) y guardamos resultados
+                    jmeter -n -t tests/performance/plan.jmx -l jmeter-results.jtl
+
+                    # Paramos la API
+                    kill $API_PID || true
+		'''
+	    }
+	}
+
     }
 
     post {
         always {
             archiveArtifacts artifacts: 'coverage.xml', fingerprint: true
+	    archiveArtifacts artifacts: 'jmeter-results.jtl', fingerprint: true
+
         }
     }
 }
