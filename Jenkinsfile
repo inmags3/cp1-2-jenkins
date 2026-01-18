@@ -67,14 +67,14 @@ pipeline {
 	            . .venv_ci/bin/activate
 
             	    # Arrancamos la API en segundo plano
-                    python -m app.api &
+                    python -m app.api >/tmp/flask.log 2>&1 &
                     API_PID=$!
 
                     # Esperamos un momento a que levante
                     sleep 2
 
-                    # Ejecutamos JMeter (no-GUI) y guardamos resultados
-                    jmeter -n -t tests/performance/plan.jmx -l jmeter-results.jtl
+                    # Ejecutar JMeter usando el binario instalado (5.6.3)
+		    /opt/jmeter/bin/jmeter -n -t tests/performance/plan.jmx -l jmeter-results.jtl
 
                     # Paramos la API
                     kill $API_PID || true
@@ -87,7 +87,7 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: 'coverage.xml', fingerprint: true
-	    archiveArtifacts artifacts: 'jmeter-results.jtl', fingerprint: true
+	    archiveArtifacts artifacts: 'jmeter-results.jtl', fingerprint: true, allowEmptyArchive: true
 
         }
     }
