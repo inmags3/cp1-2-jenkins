@@ -1,4 +1,5 @@
 import runpy
+
 import pytest
 
 from app.api import app, _get_int
@@ -26,12 +27,18 @@ def test_sub_route_invalid_params_returns_400(client):
 
 
 def test_run_as_main_covers_app_run(monkeypatch):
-    # Cubre el bloque: if __name__ == "__main__": app.run(...)
+    import sys
+    import runpy
     from flask.app import Flask
 
     def fake_run(self, *args, **kwargs):
         return None
 
     monkeypatch.setattr(Flask, "run", fake_run)
+
+    # Quitar el módulo para evitar el RuntimeWarning en CI
+    sys.modules.pop("app.api", None)
+
     runpy.run_module("app.api", run_name="__main__")
+
 
